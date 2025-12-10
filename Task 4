@@ -1,0 +1,43 @@
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from google.colab import files
+uploaded = files.upload()
+df = pd.read_csv("AccidentsBig.csv")
+print(df.head())
+print(df.info())
+print(df.describe(include='all'))
+df['Weather_Conditions'] = df['Weather_Conditions'].fillna("Unknown")
+df['Road_Type'] = df['Road_Type'].fillna("Unknown")
+df['Time'] = pd.to_datetime(df['Time'], errors='coerce')
+df['Hour'] = df['Time'].dt.hour
+plt.figure(figsize=(10,6))
+sns.countplot(x='Road_Type', data=df, order=df['Road_Type'].value_counts().index, palette="Set2")
+plt.title("Accidents by Road Condition")
+plt.xticks(rotation=45)
+plt.show()
+plt.figure(figsize=(10,6))
+sns.countplot(x='Weather_Conditions', data=df, order=df['Weather_Conditions'].value_counts().index[:10], palette="Set3")
+plt.title("Accidents by Weather Condition")
+plt.xticks(rotation=45)
+plt.show()
+plt.figure(figsize=(10,6))
+sns.histplot(df['Hour'], bins=24, kde=False, color="skyblue")
+plt.title("Accidents by Hour of Day")
+plt.xlabel("Hour of Day")
+plt.ylabel("Number of Accidents")
+plt.show()
+plt.figure(figsize=(8,6))
+sns.scatterplot(x='longitude', y='latitude', data=df, alpha=0.3, s=10, color="red")
+plt.title("Accident Hotspots")
+plt.xlabel("Longitude")
+plt.ylabel("Latitude")
+plt.show()
+numeric_df = df.select_dtypes(include=[np.number])
+plt.figure(figsize=(10,6))
+sns.heatmap(numeric_df.corr(), annot=True, cmap="coolwarm")
+plt.title("Correlation Heatmap of Accident Factors")
+plt.show()
